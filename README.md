@@ -3,7 +3,7 @@
 App helps make telegram channel mirror. We will use Telegram client API because Bot API have limited functionality. 
 
 ### Functionality
-1. Catching *NewMessage* and *MessageEdited* event and sending them forward
+1. Catching *NewMessage* event and sending them forward
 2. Flexible source and target channels mapping
 
 ## Prepare
@@ -29,14 +29,6 @@ TIMEOUT_MIRRORING=0.1 # Delay in sec between sending or editing messages
 REMOVE_URLS=false   # Apply removing URLs on messages
 # Remove URLs whitelist
 REMOVE_URLS_WL=youtube.com,youtu.be,vk.com,twitch.tv,instagram.com
-# Postgres credentials
-DATABASE_URL=postgres://user:pass@host/dbname
-# or
-DB_NAME=test
-DB_USER=test
-DB_HOST=test
-DB_PASS=test
-```
 
 ## Deploy
 ### Locally
@@ -56,13 +48,13 @@ python app/telemirror.py
 ```
 
 ## Heroku
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/khoben/telemirror)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/tsebal/telemirror)
 
 or
 
 1. Clone project
 ```
-    git clone https://github.com/khoben/telemirror.git
+    git clone https://github.com/tsebal/telemirror.git
 ```
 2. Create new heroku app within Heroku CLI
 ```
@@ -86,3 +78,5 @@ or
 ```
     heroku ps:scale run=1
 ```
+
+### original https://github.com/khoben/telemirror

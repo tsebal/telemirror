@@ -2,13 +2,10 @@
     "name": "TeleMirror",
     "description": "App helps mirroring newly created post from Telegram channels.",
     "image": "heroku/python",
-    "repository": "https://github.com/khoben/telemirror",
+    "repository": "https://github.com/tsebal/telemirror",
     "keywords": [
         "python",
         "telegram"
-    ],
-    "addons": [
-        "heroku-postgresql"
     ],
     "formation": {
         "run": {

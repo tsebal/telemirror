@@ -6,8 +6,7 @@ from telethon.sessions import StringSession
 from telethon.sync import TelegramClient
 from telethon.tl.types import InputMediaPoll, MessageMediaPoll, MessageEntityTextUrl
 
-from database import Database, MirrorMessage
-from settings import (API_HASH, API_ID, CHANNEL_MAPPING, CHATS, DB_URL,
+from settings import (API_HASH, API_ID, CHANNEL_MAPPING, CHATS,
                       LIMIT_TO_WAIT, LOG_LEVEL, REMOVE_URLS, SESSION_STRING,
                       TIMEOUT_MIRRORING)
 from utils import remove_urls
@@ -18,7 +17,6 @@ logger.setLevel(level=LOG_LEVEL)
 
 
 client = TelegramClient(StringSession(SESSION_STRING), API_ID, API_HASH)
-db = Database(DB_URL)
 
 
 def remove_url_from_message(message):
@@ -44,23 +42,14 @@ async def handler_album(event):
         files = []
         # captions
         caps = []
-        # original messages ids
-        original_idxs = []
         for item in event.messages:
             if REMOVE_URLS:
                 item = remove_url_from_message(item)
             files.append(item.media)
             caps.append(item.message)
-            original_idxs.append(item.id)
         sent = 0
         for chat in targets:
             mirror_messages = await client.send_file(chat, caption=caps, file=files)
-            if mirror_messages is not None and len(mirror_messages) > 1:
-                for idx, m in enumerate(mirror_messages):
-                    db.insert(MirrorMessage(original_id=original_idxs[idx],
-                                            original_channel=event.chat_id,
-                                            mirror_id=m.id,
-                                            mirror_channel=chat))
             sent += 1
             if sent > LIMIT_TO_WAIT:
                 sent = 0
@@ -94,40 +83,11 @@ async def handler_new_message(event):
             else:
                 mirror_message = await client.send_message(chat, event.message)
 
-            if mirror_message is not None:
-                db.insert(MirrorMessage(original_id=event.message.id,
-                                        original_channel=event.chat_id,
-                                        mirror_id=mirror_message.id,
-                                        mirror_channel=chat))
             sent += 1
             if sent > LIMIT_TO_WAIT:
                 sent = 0
                 time.sleep(TIMEOUT_MIRRORING)
 
-    except Exception as e:
-        logger.error(e, exc_info=True)
-
-
-@client.on(events.MessageEdited(chats=CHATS))
-async def handler_edit_message(event):
-    """MessageEdited event handler.
-    """
-    try:
-        logger.debug(f'Edit message {event.message.id} from {event.chat_id}')
-        targets = db.find_by_original_id(event.message.id, event.chat_id)
-        if targets is None or len(targets) < 1:
-            logger.warning(
-                f'MessageEdited. No target channel for {event.chat_id}')
-            return
-        if REMOVE_URLS:
-            event.message = remove_url_from_message(event.message)
-        sent = 0
-        for chat in targets:
-            await client.edit_message(chat.mirror_channel, chat.mirror_id, event.message.message)
-            sent += 1
-            if sent > LIMIT_TO_WAIT:
-                sent = 0
-                time.sleep(TIMEOUT_MIRRORING)
     except Exception as e:
         logger.error(e, exc_info=True)
 
