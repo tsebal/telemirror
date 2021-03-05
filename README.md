@@ -9,9 +9,7 @@ App helps make telegram channel mirror. We will use Telegram client API because 
 ## Prepare
 1. [Create Telegram App](https://my.telegram.org/apps)
 2. Obtain API App ID and hash
-![Telegram API Credentials](/images/telegramapp.png)
-3. Setup Postgres database
-4. Fill [.env-example](.env-example) with your data and rename it to .env 
+3. Fill [.env-example](.env-example) with your data and rename it to .env 
     1. SESSION_STRING can be obtained by running [login.py](login.py) with putted API_ID and API_HASH before.
 
 ```bash
